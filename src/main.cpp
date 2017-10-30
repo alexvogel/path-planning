@@ -236,6 +236,8 @@ int main() {
           	double car_yaw = j[1]["yaw"];
           	double car_speed = j[1]["speed"];
 
+            vector<double> car{car_x, car_y, car_s, car_d, car_yaw, car_speed};
+
           	// Previous path data given to the Planner
           	auto previous_path_x = j[1]["previous_path_x"];
           	auto previous_path_y = j[1]["previous_path_y"];
@@ -244,7 +246,7 @@ int main() {
           	double end_path_d = j[1]["end_path_d"];
 
           	// Sensor Fusion Data, a list of all other cars on the same side of the road.
-          	auto sensor_fusion = j[1]["sensor_fusion"];
+          	vector <vector<double>> sensor_fusion = j[1]["sensor_fusion"];
 
           	int prev_size = previous_path_x.size();
 
@@ -256,6 +258,7 @@ int main() {
           	// flag if car in front is too close
           	bool too_close_front = false;
           	double distance_front = 1000;
+          	double speed_car_front = 0;
 
           	// find ref_v to use
           	// loop through all sensed cars
@@ -282,31 +285,36 @@ int main() {
           			{
           				//ref_vel = 29.5; // mph
           				too_close_front = true;
+          				speed_car_front = check_speed;
           			}
           		}
           	}
 
           	// if lane is blocked, then try to change lane
-          	if(too_close_front)
+          	if(too_close_front && (speed_car_front*2.24 < ref_vel))
           	{
-
-          		// behaviour planner
-          		Behaviour behave(lane);
-          		// set lane to new value if needed
-          		lane = behave.getLane(sensor_fusion, car, ref_vel, lane);
-
           		// reduce speed
-          		ref_vel -= 1.3/distance_front;
+          		cout << "speed of front car: " << speed_car_front*2.24 << " my speed: " << ref_vel<< endl;
+          		//ref_vel -= 1.3/distance_front;
+          		//ref_vel -= min(2.0, ref_vel-speed_car_front);
+          		ref_vel -= max(min(1.8, (speed_car_front*2.24)), 0.224);
+
+       			// behaviour planner
+      			Behaviour behave(lane);
+       			// set lane to new value if needed
+     			lane = behave.getLane(sensor_fusion, car, ref_vel, lane);
+
           	}
           	else if(ref_vel < 47.5)
           	{
-          		ref_vel += 2.0;
+          		ref_vel += 1.8;
           		//ref_vel += 0.224;
           	}
           	else if(ref_vel < 49.5)
           	{
           		ref_vel += 0.224;
           	}
+
 
 
 

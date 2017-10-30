@@ -2,41 +2,39 @@
 #define TERMS_LABELS_H
 
 
-// indicies are better with proper names
-
-// Sensor Fusion labels
+// Labels for Sensor Fusion
 enum SF
 {
-	id,
-	x,
-	y,
-	vx,
-	vy,
-	s,
-	d,
+	SF_id,
+	SF_x,
+	SF_y,
+	SF_vx,
+	SF_vy,
+	SF_s,
+	SF_d,
 };
 
-// Car localization Data labels
+// Labels for Ego Car
 enum Ego
 {
-    	x,
-  	y, 
-  	s,
-  	d,
-  	yaw,
-  	speed,
+    Ego_x,
+  	Ego_y, 
+  	Ego_s,
+  	Ego_d,
+  	Ego_yaw,
+  	Ego_speed,
 };
 
 
-// Actions to be considered
+// Possible actions
 enum Action
 {
-    CS, 
-    KL, 
-    PLCL, 
-    PLCR, 
-    LCL, 
-    LCR, 
+    A_CS, 
+    A_KL, 
+    A_PLCL, 
+    A_PLCR, 
+    A_LCL, 
+    A_LCR, 
 };
 
 

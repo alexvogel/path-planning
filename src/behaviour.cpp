@@ -1,7 +1,10 @@
 #include "behaviour.h"
 
 // Constructor
-Behaviour::Behaviour(){}
+Behaviour::Behaviour(int lane){}
+
+// Destructor
+Behaviour::~Behaviour(){}
 
 // selects lane
 int Behaviour::getLane(vector<vector<double>> &sensor_fusion, vector<double> &car, double &ref_vel, int lane)
@@ -34,72 +37,60 @@ int Behaviour::getLane(vector<vector<double>> &sensor_fusion, vector<double> &ca
 	// calculate cost based on lane choices
 	vector<int> costs;
 	for(int i=0; i<lanes.size(); i++)
-		costs.push_back(getCost(sensor_fusion, car, ref_vel, lanes[i]);
+		costs.push_back(getCost(sensor_fusion, car, ref_vel, lanes[i]));
 
 	// det lane with lowest cost
-	int cost = 10000000; // very high value
+	int cost = 100000; // very high value
+	int new_lane = lane; // current lane
 	for(int i=0; i<lanes.size(); i++)
 	{
 		if(costs[i] < cost)
 		{
-			int new_lane = lanes[i];
+			new_lane = lanes[i];
 			cost = costs[i];
 		}
 	}
+
+	printCostInfo(costs, lanes);
 
 	return new_lane;
 }
 
 // det cost
-Behaviour::getCost(vector<vector<double>> &sensor_fusion, vector<double> &car, double &ref_vel, int lane)
+int Behaviour::getCost(vector<vector<double>> &sensor_fusion, vector<double> &car, double &ref_vel, int lane)
 {
 	// initial cost is zero
 	int cost = 0;
 
 	// for every detected car
-	for(int i=0; i < sensorfusion.size(); i++)
+	for(int i=0; i < sensor_fusion.size(); i++)
 	{
 		// extract position and motion data for current car from sensor fusion
-		double d = sensor_fusion[i][SF::d];
-		double s = sensor_fusion[i][SF::s];
-		double vx = sensor_fusion[i][SF::vx];
-		double vy = sensor_fusion[i][SF::vy];
+		double d = sensor_fusion[i][SF::SF_d];
+		double s = sensor_fusion[i][SF::SF_s];
+		double vx = sensor_fusion[i][SF::SF_vx];
+		double vy = sensor_fusion[i][SF::SF_vy];
 
 		// check if the current sensed car is in the assumptious lane (to possibly change to)
-		if( d < (2+4*lane + 2) && d > (2+4*lane - 2))
+		// and if its ahead of ego
+		if(( d < (2+4*lane + 2) && d > (2+4*lane - 2)) && (s+7 > car[Ego::Ego_s]) && s < (car[Ego::Ego_s] + 100))
       	{
-      		// if current sensed car is outside the ego's lane
-   			// in d: > 2m
-      		if(fabs(car[Ego::d] - d) > 2)
-      		{
-      			// if ego distance to current sensed car is
-      			// in s: < 15m
-      			if((fabs(car[Ego::s] - s) < 15))
-      			{
-      				cost += 500/fabs(car[Ego::s] - s);
-      			}
-      		}
-
-      		// if current sensed car is inside the ego's lane
-      		else if(fabs(car[Ego::d] - d) < 2)
-      		{
-      			// if ego distance to current sensed car is
-      			// in s: < 30m
-      			if((fabs(car[Ego::s] - s) < 30))
-      			{
-      				cost += 500/fabs(car[Ego::s] - s);
-      			}
-      		}
-
-      		// if outside drivable lanes
-      		if(car[Ego::d] < 1 || car[Ego::d] > 12)
-      		{
-      			cost += 5000
-      		}
+  			// if s distance to current sensed car is < 30m, then cost is applied
+			cost += 1000/fabs(car[Ego::Ego_s] - s);
+      	}
 
 
 	}
 
 	return cost;
+}
+
+void Behaviour::printCostInfo(vector<int> costs, vector<int> lanes)
+{
+	std::cout << "-------------" << std::endl;
+	for(int i = 0; i < costs.size(); ++i)
+	{
+		std::cout << "lane: " << lanes[i] << " | cost: " << costs[i]<< std::endl;	
+	}
 }
 
