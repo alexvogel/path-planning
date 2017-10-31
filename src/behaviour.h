@@ -8,7 +8,7 @@
 #include <string>
 
 
-#include "terms_labels.h"
+#include "labels.h"
 
 using namespace std;
 
