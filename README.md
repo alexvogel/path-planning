@@ -28,12 +28,7 @@ The best lane with the smallest cost is chosen in the `behaviour.cpp` in the `ge
 
 The track waypoints given in the `highway_map.csv` describe the road curvature and are spaced roughly 30 meters apart. These points are used to interpolate points in between the given waypoints. With the lane informatione from the Behaviour Planner the desired future Ego positions can be calculated. The last and the current Ego position build the beginning of the trajectory, the last 2 future positions build the end of the trajectory. With the `spline.h` library all points of the trajectory are calculated.
 
-## Conclusion
-
-It is a simple and robust way to steer the car through the simulated environment. Even after a 1h there were no incidents.
-![SimulationLongRun][image1]
-
-#### Path Planning In Simulator
+## Path Planning In Simulator
 
 This is how the simulator looks like when running this path planning implementation
 
