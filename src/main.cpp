@@ -307,7 +307,7 @@ int main() {
           	}
           	else if(ref_vel < 47.5)
           	{
-          		ref_vel += 1.8;
+          		ref_vel += 1.5;
           		//ref_vel += 0.224;
           	}
           	else if(ref_vel < 49.5)

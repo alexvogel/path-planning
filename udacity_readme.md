@@ -1,55 +1,10 @@
-# Udacity Self-Driving Car Engineer Nanodegree
-# Path Planning Project
-
-[//]: # (Image References)
-[image1]: ./media/longrun.png  "Simulation Long Run"
-
-## Introduction
-
-The goal of this project is to design a path planner that is able to create smooth, safe paths for the car to follow along a 3 lane highway with traffic. The car must not violate a set of motion constraints, namely maximum velocity, maximum acceleration, and maximum jerk, while also avoiding collisions with other vehicles, keeping to within a highway lane (aside from short periods of time while changing lanes), and changing lanes when doing so is necessary to maintain a speed near the speed limit of 50 mph.
-
-## Implementation
-
-### 1. Plan Behaviour
-
-The goal of the Behaviour Planner is to determine which behaviour is the best for our Ego car. A Finite State Machine with 5 states is used to determine the next action.
-
-the states are:
-
-	Keep Lane
-	Change Lane Left
-	Change Lane Right
-
-If there is another car in front of Ego, then the cost for staying in the current lane and changing in each (reachable) lane are calculated by increasing the cost, for every other car present in the next 100 meter of the lane in question, proportionally to its distance to Ego. This is implemented in the file `behaviour.cpp` in the `getCost` function.
-
-The best lane with the smallest cost is chosen in the `behaviour.cpp` in the `getLane` function.
-
-### 2. Create Trajectory
-
-The track waypoints given in the `highway_map.csv` describe the road curvature and are spaced roughly 30 meters apart. These points are used to interpolate points in between the given waypoints. With the lane informatione from the Behaviour Planner the desired future Ego positions can be calculated. The last and the current Ego position build the beginning of the trajectory, the last 2 future positions build the end of the trajectory. With the `spline.h` library all points of the trajectory are calculated.
-
-## Conclusion
-
-It is a simple and robust way to steer the car through the simulated environment. Even after a 1h there were no incidents.
-![SimulationLongRun][image1]
-
-#### Path Planning In Simulator
-
-This is how the simulator looks like when running this path planning implementation
-
-[![Path Planning](./media/icon_video.png)](https://youtu.be/_gTrpS7Bxgw "Path Planning")
-
-
-
-*the description below is Udacity's original README for the project repo*
-
----
-
 # CarND-Path-Planning-Project
 Self-Driving Car Engineer Nanodegree Program
    
-### Simulator. You can download the Term3 Simulator BETA which contains the Path Planning Project from the [releases tab](https://github.com/udacity/self-driving-car-sim/releases).
+### Simulator.
+You can download the Term3 Simulator which contains the Path Planning Project from the [releases tab (https://github.com/udacity/self-driving-car-sim/releases).
 
+### Goals
 In this project your goal is to safely navigate around a virtual highway with other traffic that is driving +-10 MPH of the 50 MPH speed limit. You will be provided the car's localization and sensor fusion data, there is also a sparse map list of waypoints around the highway. The car should try to go as close as possible to the 50 MPH speed limit, which means passing slower traffic when possible, note that other cars will try to change lanes too. The car should avoid hitting other cars at all cost as well as driving inside of the marked road lanes at all times, unless going from one lane to another. The car should be able to make one complete loop around the 6946m highway. Since the car is trying to go 50 MPH, it should take a little over 5 minutes to complete 1 loop. Also the car should not experience total acceleration over 10 m/s^2 and jerk that is greater than 50 m/s^3.
 
 #### The map of the highway is in data/highway_map.txt
@@ -179,4 +134,7 @@ that's just a guess.
 
 One last note here: regardless of the IDE used, every submitted project must
 still be compilable with cmake and make./
+
+## How to write a README
+A well written README file can enhance your project and portfolio.  Develop your abilities to create professional README files by completing [this free course](https://www.udacity.com/course/writing-readmes--ud777).
 
