@@ -2,7 +2,7 @@
 # Path Planning Project
 
 [//]: # (Image References)
-[image1]: ./media/longrun.png  "Simulation Long Run"
+[image1]: ./media/longrun1.png  "Simulation Long Run"
 
 ## Introduction
 
