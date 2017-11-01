@@ -30,6 +30,10 @@ The track waypoints given in the `highway_map.csv` describe the road curvature a
 
 ## Path Planning In Simulator
 
+The Path Planner seems to be really robust like the screenshot shows:
+
+![Longrun][image1]
+
 This is how the simulator looks like when running this path planning implementation
 
 [![Path Planning](./media/icon_video.png)](https://youtu.be/_gTrpS7Bxgw "Path Planning")

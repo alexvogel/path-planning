@@ -209,7 +209,10 @@ int main() {
   // Have a reference velocity to target
   double ref_vel = 0; // mph
 
-  h.onMessage([&ref_vel, &map_waypoints_x,&map_waypoints_y,&map_waypoints_s,&map_waypoints_dx,&map_waypoints_dy, &lane](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length,
+  // delay acceleration
+  int acc_delay = -1;
+
+  h.onMessage([&ref_vel, &map_waypoints_x,&map_waypoints_y,&map_waypoints_s,&map_waypoints_dx,&map_waypoints_dy, &lane, &acc_delay](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length,
                      uWS::OpCode opCode) {
     // "42" at the start of the message means there's a websocket message event.
     // The 4 signifies a websocket message
@@ -257,8 +260,8 @@ int main() {
 
           	// flag if car in front is too close
           	bool too_close_front = false;
-          	double distance_front = 1000;
-          	double speed_car_front = 0;
+          	double smallest_distance_front = 1000;
+          	double speed_car_front = 1000;
 
           	// find ref_v to use
           	// loop through all sensed cars
@@ -280,43 +283,85 @@ int main() {
 
           			// check s values greater than mine and s gap
           			// if car is in front of us and the distance is < than 30m
-          			distance_front = check_car_s - car_s;
-          			if((check_car_s > car_s) && (distance_front < 30))
+          			if(check_car_s > car_s)
           			{
-          				//ref_vel = 29.5; // mph
-          				too_close_front = true;
-          				speed_car_front = check_speed;
+          				double distance_front = check_car_s - car_s;
+          				if(distance_front < smallest_distance_front)
+          				{
+          					smallest_distance_front = distance_front;
+          				}
+
+          				if(smallest_distance_front < 35)
+	          			{
+    	      				//ref_vel = 29.5; // mph
+        	  				too_close_front = true;
+          					speed_car_front = check_speed;
+          					
+          				}
+
           			}
+          			
           		}
           	}
 
-          	// if lane is blocked, then try to change lane
-          	if(too_close_front && (speed_car_front*2.24 < ref_vel))
+//          	cout << "outside loop distance_front " << smallest_distance_front << endl;
+          	if((too_close_front && (speed_car_front*2.24 < ref_vel)))
           	{
           		// reduce speed
           		cout << "speed of front car: " << speed_car_front*2.24 << " my speed: " << ref_vel<< endl;
           		//ref_vel -= 1.3/distance_front;
           		//ref_vel -= min(2.0, ref_vel-speed_car_front);
-          		ref_vel -= max(min(1.8, (speed_car_front*2.24)), 0.224);
+
+          		int factor = 2;
+
+          		if(smallest_distance_front < 20)
+          		{
+          			factor = 4;
+          		}
+
+          		double decrease_vel = max(min(1.5, fabs((speed_car_front*2.24)-ref_vel) * factor / smallest_distance_front ), 0.224);
+          		ref_vel -= decrease_vel;
+     			cout << "traffic ahead (" << smallest_distance_front << "). decreasing velocity to " << ref_vel << " (by " << decrease_vel << ")" << endl;
+     		}
+
+     		// if lane is blocked and velocity < 43, then try to change lane
+     		if(too_close_front && (ref_vel < 43))
+     		{
+     			cout << "velocity < 43. checking for lane change." << endl;
+
+          		int old_lane = lane;
 
        			// behaviour planner
       			Behaviour behave(lane);
        			// set lane to new value if needed
      			lane = behave.getLane(sensor_fusion, car, ref_vel, lane);
 
+     			// if lane change, then delay acceleration to not exceed acc limits
+     			if(old_lane != lane)
+     			{
+     				acc_delay = 25;
+     				cout << "changing from lane " << old_lane << " to " << lane << endl;
+     				cout << "because of lane change, accN will be already high. holding throttle constant for 20 iterations to reduce accT to 0" << endl;
+     			}
+
           	}
-          	else if(ref_vel < 47.5)
+          	if( !too_close_front && (ref_vel < 47.5) && (acc_delay < 0))
           	{
-          		ref_vel += 1.5;
+          		ref_vel += 0.4;
+          		cout << "increasing velocity to " << ref_vel << endl;
           		//ref_vel += 0.224;
           	}
-          	else if(ref_vel < 49.5)
+          	else if( !too_close_front && (ref_vel < 49.5) && (acc_delay < 0))
           	{
           		ref_vel += 0.224;
+          		cout << "increasing velocity to " << ref_vel << endl;
+          	}
+          	else if(acc_delay > 0)
+          	{
+          		cout << "holding velocity constant " << ref_vel << endl;
           	}
 
-
-
+          	acc_delay -= 1;
 
           	// create a list of widely spaced (x,y) waypoints, evenly spaced at 30m
           	// Later we will interpolate these waypoints with a spline and fill it in with more points that control speed

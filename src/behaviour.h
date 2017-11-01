@@ -28,9 +28,9 @@ public:
 	int getLane(vector<vector<double>> &sensor_fusion, vector<double> &car, double &ref_vel, int lane);
 
 	// determine cost
- 	int getCost(vector<vector<double>> &sensor_fusion, vector<double> &car, double &ref_vel, int lane);
+ 	double getCost(vector<vector<double>> &sensor_fusion, vector<double> &car, double &ref_vel, int lane);
 
- 	void printCostInfo(vector<int> costs, vector<int> lanes);
+ 	void printCostInfo(vector<double> costs, vector<int> lanes);
 };
 
 #endif
